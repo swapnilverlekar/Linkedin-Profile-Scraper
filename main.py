@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-# from urllib.request import urlopen
-import json
 
 
 path = "/Users/swapn/Downloads/chromedriver_mac64.exe"
@@ -44,7 +42,43 @@ def redirectAndScroll(targetUrl):
     source = BeautifulSoup(driver.page_source, "html.parser")
     return source
 
-def extractProfileIntro(source):
+# def parseType2Jobs(alltext):
+#     jobgroups = []
+#     company = alltext[16][:len(alltext[16]) // 2]
+#     totalDurationAtCompany = alltext[20][:len(alltext[20]) // 2]
+#
+#     # get rest of the jobs in the same nested list
+#     groups = []
+#     count = 0
+#     index = 0
+#     for a in alltext:
+#         if a == '' or a == ' ':
+#             count += 1
+#         else:
+#             groups.append((count, index))
+#             count = 0
+#         index += 1
+#
+#     numJobsInJoblist = [g for g in groups if g[0] == 21 or g[0] == 22 or g[0] == 25 or g[0] == 26]
+#     for i in numJobsInJoblist:
+#         # full time/part time case
+#         if 'time' in alltext[i[1] + 5][:len(alltext[i[1] + 5]) // 2].lower().split('-'):
+#             jobgroups.append((alltext[i[1]][:len(alltext[i[1]]) // 2], alltext[i[1] + 8][:len(alltext[i[1] + 8]) // 2]))
+#         else:
+#             jobgroups.append((alltext[i[1]][:len(alltext[i[1]]) // 2], alltext[i[1] + 4][:len(alltext[i[1] + 4]) // 2]))
+#     return ('type2job', company, totalDurationAtCompany, jobgroups)
+#
+#
+# def parseType1Job(alltext):
+#     jobtitle = alltext[16][:len(alltext[16]) // 2]
+#     company = alltext[20][:len(alltext[20]) // 2]
+#     duration = alltext[23][:len(alltext[23]) // 2]
+#     return ('type1job', jobtitle, company, duration)
+
+
+
+def extractProfile(source):
+    #extracting intro
     intro = source.find('div', {'class': 'pv-text-details__left-panel'})
     location = source.find('div', {'class': 'pv-text-details__left-panel mt2'})
     about = source.find('div', {'class': 'pv-shared-text-with-see-more full-width t-14 t-normal t-black display-flex align-items-center'})
@@ -55,16 +89,22 @@ def extractProfileIntro(source):
     title = title_block.get_text().strip()
     location_block = location.find('span', {'class': 'text-body-small inline t-black--light break-words'})
     loc = location_block.get_text().strip()
-
+    #extracting about me
     about_block = about.find('span', {'class': 'visually-hidden'})
     abt = about_block.get_text().strip()
-    print(name, title, loc)
-    print(abt)
-    # print("---------")
-    # print(location)
+    # print(name, title, loc)
+    # print(abt)
 
+    experiences = source.find_all('li', class_='artdeco-list__item pvs-list__item--line-separated pvs-list__item--one-column')
+    profile_details = []
+    for x in experiences[1:]:
+        alltext = x.getText().split('\n')
+        profile_details.append([x for x in alltext if len(x)>=3])
+        # print(alltext)
+    for i in profile_details:
+        print(i)
 
 login()
 targetUrl = "https://www.linkedin.com/in/prathamesh-verlekar/"
 source = redirectAndScroll(targetUrl)
-extractProfileIntro(source)
+extractProfile(source)
