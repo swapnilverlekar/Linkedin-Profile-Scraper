@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
+import pandas as pd
 
 path = "/Users/swapn/Downloads/chromedriver_mac64.exe"
 
@@ -46,6 +46,7 @@ def redirectAndScroll(targetUrl):
 
 def extractProfile(source):
     #extracting intro
+    info = []
     intro = source.find('div', {'class': 'pv-text-details__left-panel'})
     location = source.find('div', {'class': 'pv-text-details__left-panel mt2'})
     about = source.find('div', {'class': 'pv-shared-text-with-see-more full-width t-14 t-normal t-black display-flex align-items-center'})
@@ -57,8 +58,8 @@ def extractProfile(source):
     location_block = location.find('span', {'class': 'text-body-small inline t-black--light break-words'})
     loc = location_block.get_text().strip()
     #extracting about me
-    about_block = about.find('span', {'class': 'visually-hidden'})
-    abt = about_block.get_text().strip()
+    # about_block = about.find('span', {'class': 'visually-hidden'})
+    abt = about.get_text().strip()
     # print(name, title, loc)
     # print(abt)
 
@@ -68,10 +69,29 @@ def extractProfile(source):
         alltext = x.getText().split('\n')
         profile_details.append([x for x in alltext if len(x)>=3])
         # print(alltext)
-    for i in profile_details:
-        print(i)
+    # for i in profile_details:
+    #     print(i)
+
+    info.append([name])
+    info.append([title])
+    info.append([loc])
+    info.append([abt])
+    info.append(profile_details)
+    return info
+
+def convertToCSV(info):
+    #converting data to csv file
+    column_names = ["Full Name", "Title", "Current Location", 'About Section', 'Profile Information']
+
+    df = pd.DataFrame(info, column_names)
+
+    df_T = df.transpose()
+    df_T.to_csv('data.csv', index=False)
+
 
 login()
-targetUrl = "https://www.linkedin.com/in/prathamesh-verlekar/"
+targetUrl = "https://www.linkedin.com/in/satyanadella/"
 source = redirectAndScroll(targetUrl)
-extractProfile(source)
+info = extractProfile(source)
+convertToCSV(info)
+print("**************** Linkedin Profile Extraction Complete ****************")
