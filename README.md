@@ -25,7 +25,8 @@ https://user-images.githubusercontent.com/48671736/222282277-f3ac12ee-0c8a-464d-
 Note: This code scrapes all the data from a single profile, however the code can be modified to extract only particular selected profile data.
 
 
-#### Reference
+### References
 
 https://www.geeksforgeeks.org/scrape-linkedin-using-selenium-and-beautiful-soup-in-python/
+
 https://www.youtube.com/watch?v=yxTtMNWqnMA
